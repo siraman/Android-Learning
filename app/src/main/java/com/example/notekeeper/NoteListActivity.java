@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,6 +13,8 @@ import android.widget.ListView;
 import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
+
+    private ArrayAdapter<NoteInfo> mAdapterNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +34,17 @@ public class NoteListActivity extends AppCompatActivity {
         initializeDisplayContent();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAdapterNotes.notifyDataSetChanged();
+    }
+
     private void initializeDisplayContent() {
         final ListView listNotes = findViewById(R.id.list_notes);
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, notes);
-        listNotes.setAdapter(adapterNotes);
+        mAdapterNotes = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, notes);
+        listNotes.setAdapter(mAdapterNotes);
 
         listNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
