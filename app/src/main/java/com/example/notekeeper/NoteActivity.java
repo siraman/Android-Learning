@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -27,14 +26,14 @@ public class NoteActivity extends AppCompatActivity {
     private EditText textNoteText;
     private int mNotePosition;
     private boolean mIsCancelling;
-    private String mOriginalNoteCouseId;
+    private String mOriginalNoteCourseId;
     private String mOriginalNoteTitle;
     private String mOriginalNoteText;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ORIGINAL_NOTE_COURSE_ID, mOriginalNoteCouseId);
+        outState.putString(ORIGINAL_NOTE_COURSE_ID, mOriginalNoteCourseId);
         outState.putString(ORIGINAL_NOTE_COURSE_TITLE, mOriginalNoteTitle);
         outState.putString(ORIGINAL_NOTE_COURSE_TEXT, mOriginalNoteText);
     }
@@ -67,7 +66,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void restoreOriginalNoteValues(Bundle savedInstanceState) {
-        mOriginalNoteCouseId = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_ID);
+        mOriginalNoteCourseId = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_ID);
         mOriginalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_TEXT);
         mOriginalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_TITLE);
     }
@@ -76,7 +75,7 @@ public class NoteActivity extends AppCompatActivity {
         if(mIsNewNote){
             return;
         }
-        mOriginalNoteCouseId = mNote.getCourse().getCourseId();
+        mOriginalNoteCourseId = mNote.getCourse().getCourseId();
         mOriginalNoteTitle = mNote.getTitle();
         mOriginalNoteText = mNote.getText();
     }
@@ -134,7 +133,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void storePreviousNoteValues() {
-        CourseInfo course = DataManager.getInstance().getCourse(mOriginalNoteCouseId);
+        CourseInfo course = DataManager.getInstance().getCourse(mOriginalNoteCourseId);
         mNote.setCourse(course);
         mNote.setText(mOriginalNoteText);
         mNote.setTitle(mOriginalNoteTitle);

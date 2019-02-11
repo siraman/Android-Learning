@@ -67,7 +67,8 @@ public class NavActivity extends AppCompatActivity
         final ListView listNotes = findViewById(R.id.list_items);
         recyclerItems = findViewById(R.id.list_items);
         notesLayoutManager = new LinearLayoutManager(this);
-        gridLayoutManager = new GridLayoutManager(this,2);
+        gridLayoutManager = new GridLayoutManager(this,
+                getResources().getInteger(R.integer.course_grid_span));
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
         noteRecyclerAdapter = new NoteRecyclerAdapter(this,notes);
@@ -123,6 +124,7 @@ public class NavActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
