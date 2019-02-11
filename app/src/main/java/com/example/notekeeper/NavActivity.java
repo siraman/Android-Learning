@@ -1,6 +1,7 @@
 package com.example.notekeeper;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -27,6 +28,13 @@ public class NavActivity extends AppCompatActivity
     private LinearLayoutManager notesLayoutManager;
     private CourseRecyclerAdapter courseRecyclerAdapter;
     private GridLayoutManager gridLayoutManager;
+    private NoteKeeperOpenHelper dbOpenHelper;
+
+    @Override
+    protected void onDestroy() {
+        dbOpenHelper.close();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,8 @@ public class NavActivity extends AppCompatActivity
         setContentView(R.layout.activity_main_nav);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        dbOpenHelper = new NoteKeeperOpenHelper(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +74,7 @@ public class NavActivity extends AppCompatActivity
     }
 
     private void initializeDisplayContent() {
+        DataManager.loadFromDatabase(dbOpenHelper);
         final ListView listNotes = findViewById(R.id.list_items);
         recyclerItems = findViewById(R.id.list_items);
         notesLayoutManager = new LinearLayoutManager(this);
