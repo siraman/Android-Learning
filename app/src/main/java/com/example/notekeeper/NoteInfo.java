@@ -11,8 +11,16 @@ public final class NoteInfo implements Parcelable{
     private CourseInfo mCourse;
     private String mTitle;
     private String mText;
+    private int mId;
 
     public NoteInfo(CourseInfo course, String title, String text) {
+        mCourse = course;
+        mTitle = title;
+        mText = text;
+    }
+
+    public NoteInfo(int id, CourseInfo course, String title, String text) {
+        mId = id;
         mCourse = course;
         mTitle = title;
         mText = text;
@@ -22,6 +30,10 @@ public final class NoteInfo implements Parcelable{
         mCourse = parcel.readParcelable(CourseInfo.class.getClassLoader());
         mTitle = parcel.readString();
         mText = parcel.readString();
+    }
+
+    public int getId() {
+        return mId;
     }
 
     public CourseInfo getCourse() {
