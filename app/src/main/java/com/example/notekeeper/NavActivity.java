@@ -1,11 +1,14 @@
 package com.example.notekeeper;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.content.CursorLoader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,7 +28,8 @@ import java.util.List;
 import static com.example.notekeeper.NoteKeeperDatabaseContract.*;
 
 public class NavActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int LOADER_NOTES = 0;
     private NoteRecyclerAdapter noteRecyclerAdapter;
     private RecyclerView recyclerItems;
     private LinearLayoutManager notesLayoutManager;
@@ -74,7 +78,7 @@ public class NavActivity extends AppCompatActivity
         super.onResume();
 //        mAdapterNotes.notifyDataSetChanged();
 //        noteRecyclerAdapter.notifyDataSetChanged();
-        loadNotes();
+        getLoaderManager().restartLoader(LOADER_NOTES,null,this);
 
     }
 
@@ -83,7 +87,7 @@ public class NavActivity extends AppCompatActivity
         final String[] noteColumns = {
                 NoteInfoEntry.COLUMN_NOTE_TITLE,
                 NoteInfoEntry.COLUMN_COURSE_ID,
-                NoteInfoEntry._ID };
+                NoteInfoEntry._ID};
         String noteOrderBy = NoteInfoEntry.COLUMN_COURSE_ID + " ," + NoteInfoEntry.COLUMN_NOTE_TITLE;
         final Cursor noteCursor = db.query(NoteInfoEntry.TABLE_NAME, noteColumns,
                 null, null, null, null, noteOrderBy);
@@ -100,7 +104,7 @@ public class NavActivity extends AppCompatActivity
                 getResources().getInteger(R.integer.course_grid_span));
 
 //        List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        noteRecyclerAdapter = new NoteRecyclerAdapter(this,null);
+        noteRecyclerAdapter = new NoteRecyclerAdapter(this, null);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         courseRecyclerAdapter = new CourseRecyclerAdapter(this, courses);
@@ -121,7 +125,7 @@ public class NavActivity extends AppCompatActivity
         menu.findItem(id).setChecked(true);
     }
 
-    private void displayCourses(){
+    private void displayCourses() {
         recyclerItems.setLayoutManager(gridLayoutManager);
         recyclerItems.setAdapter(courseRecyclerAdapter);
         setNavigationMenuItem(R.id.nav_courses);
@@ -160,7 +164,6 @@ public class NavActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -185,6 +188,52 @@ public class NavActivity extends AppCompatActivity
 
     private void handleSelection(String message) {
         View view = findViewById(R.id.list_items);
-        Snackbar.make(view,message,Snackbar.LENGTH_LONG).show();
+        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        CursorLoader loader = null;
+        if (i == LOADER_NOTES) {
+            loader = new CursorLoader(this) {
+                @Override
+                public Cursor loadInBackground() {
+                    SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
+                    final String[] noteColumns = {
+                            NoteInfoEntry.getQName(NoteInfoEntry._ID),
+                            NoteInfoEntry.COLUMN_NOTE_TITLE,
+                            //NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID),
+                            CourseInfoEntry.COLUMN_COURSE_TITLE
+                    };
+                    final String noteOrderBy = CourseInfoEntry.COLUMN_COURSE_TITLE +
+                            "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
+
+                    String tableWithJoin = NoteInfoEntry.TABLE_NAME + " JOIN "+
+                            CourseInfoEntry.TABLE_NAME + " ON " +
+                            NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID) + " = " +
+                            CourseInfoEntry.getQName(CourseInfoEntry.COLUMN_COURSE_ID);
+
+                    return db.query(tableWithJoin, noteColumns,
+                            null, null, null, null, noteOrderBy);
+                }
+            };
+        }
+        return loader;
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if(loader.getId() == LOADER_NOTES)
+        {
+            noteRecyclerAdapter.changeCursor(cursor);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if(loader.getId() == LOADER_NOTES){
+            noteRecyclerAdapter.changeCursor(null);
+        }
     }
 }

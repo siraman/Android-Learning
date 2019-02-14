@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import static com.example.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.example.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>{
@@ -34,7 +35,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         if(mCursor == null){
             return;
         }
-        coursePos = mCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+        coursePos = mCursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_TITLE);
         noteTitlePos = mCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         noteIdPos = mCursor.getColumnIndex(NoteInfoEntry._ID);
     }
@@ -69,7 +70,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
     @Override
     public int getItemCount() {
-        return mCursor == null ? 0 : mCursor.getCount();
+        return mCursor == null ? 0  : mCursor.getCount();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
