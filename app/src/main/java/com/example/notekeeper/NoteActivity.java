@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import android.widget.Spinner;
 import com.example.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import com.example.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
+import java.net.URI;
 import java.util.zip.CheckedOutputStream;
 
 public class NoteActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -376,20 +378,30 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private CursorLoader createLoaderCourses() {
         coursesQueryFinished = false;
-        return new CursorLoader(this){
-            @Override
-            public Cursor loadInBackground() {
-                SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
+//        Uri uri = Uri.parse("content://com.example.notekeeper.provider");
+        Uri uri = NoteKeeperProviderContract.Courses.CONTENT_URI;
 
-                String[] courseColumns = {
-                        CourseInfoEntry.COLUMN_COURSE_TITLE,
-                        CourseInfoEntry.COLUMN_COURSE_ID,
-                        CourseInfoEntry._ID
-                };
-                return db.query(CourseInfoEntry.TABLE_NAME, courseColumns,null,
-                        null,null, null, CourseInfoEntry.COLUMN_COURSE_TITLE);
-            }
+        String[] courseColumns = {
+                NoteKeeperProviderContract.Courses.COLUMN_COURSE_TITLE,
+                NoteKeeperProviderContract.Courses.COLUMN_COURSE_ID,
+                NoteKeeperProviderContract.Courses._ID
         };
+        return new CursorLoader(this,uri,courseColumns,null,null, NoteKeeperProviderContract.Courses.COLUMN_COURSE_TITLE);
+
+//        return new CursorLoader(this){
+//            @Override
+//            public Cursor loadInBackground() {
+//                SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
+//
+//                String[] courseColumns = {
+//                        CourseInfoEntry.COLUMN_COURSE_TITLE,
+//                        CourseInfoEntry.COLUMN_COURSE_ID,
+//                        CourseInfoEntry._ID
+//                };
+//                return db.query(CourseInfoEntry.TABLE_NAME, courseColumns,null,
+//                        null,null, null, CourseInfoEntry.COLUMN_COURSE_TITLE);
+//            }
+//        };
     }
 
     private CursorLoader createLoaderNotes() {

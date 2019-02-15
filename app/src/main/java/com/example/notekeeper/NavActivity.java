@@ -78,7 +78,7 @@ public class NavActivity extends AppCompatActivity
         super.onResume();
 //        mAdapterNotes.notifyDataSetChanged();
 //        noteRecyclerAdapter.notifyDataSetChanged();
-        getLoaderManager().restartLoader(LOADER_NOTES,null,this);
+        getLoaderManager().restartLoader(LOADER_NOTES, null, this);
 
     }
 
@@ -195,28 +195,17 @@ public class NavActivity extends AppCompatActivity
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         CursorLoader loader = null;
         if (i == LOADER_NOTES) {
-            loader = new CursorLoader(this) {
-                @Override
-                public Cursor loadInBackground() {
-                    SQLiteDatabase db = dbOpenHelper.getReadableDatabase();
-                    final String[] noteColumns = {
-                            NoteInfoEntry.getQName(NoteInfoEntry._ID),
-                            NoteInfoEntry.COLUMN_NOTE_TITLE,
-                            //NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID),
-                            CourseInfoEntry.COLUMN_COURSE_TITLE
-                    };
-                    final String noteOrderBy = CourseInfoEntry.COLUMN_COURSE_TITLE +
-                            "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
-
-                    String tableWithJoin = NoteInfoEntry.TABLE_NAME + " JOIN "+
-                            CourseInfoEntry.TABLE_NAME + " ON " +
-                            NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID) + " = " +
-                            CourseInfoEntry.getQName(CourseInfoEntry.COLUMN_COURSE_ID);
-
-                    return db.query(tableWithJoin, noteColumns,
-                            null, null, null, null, noteOrderBy);
-                }
+            final String[] noteColumns = {
+                    NoteKeeperProviderContract.Notes._ID,
+                    NoteKeeperProviderContract.Notes.COLUMN_NOTE_TITLE,
+                    //NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID),
+                    NoteKeeperProviderContract.Notes.COLUMN_COURSE_TITLE
             };
+            final String noteOrderBy = NoteKeeperProviderContract.Notes.COLUMN_COURSE_TITLE +
+                    "," + NoteKeeperProviderContract.Notes.COLUMN_NOTE_TITLE;
+
+            loader = new CursorLoader(this, NoteKeeperProviderContract.Notes.PATH_EXPANDED_URI,noteColumns,
+                    null,null,noteOrderBy);
         }
         return loader;
     }
@@ -224,15 +213,14 @@ public class NavActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if(loader.getId() == LOADER_NOTES)
-        {
+        if (loader.getId() == LOADER_NOTES) {
             noteRecyclerAdapter.changeCursor(cursor);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(loader.getId() == LOADER_NOTES){
+        if (loader.getId() == LOADER_NOTES) {
             noteRecyclerAdapter.changeCursor(null);
         }
     }
